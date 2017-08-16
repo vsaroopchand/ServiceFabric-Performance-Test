@@ -1,0 +1,20 @@
+{
+  "name": "test-app",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Vishal Saroopchand <vsaroopchand@hotmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/vsaroopchand/aig-scratchpad",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

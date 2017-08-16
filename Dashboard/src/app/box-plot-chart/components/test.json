@@ -1,0 +1,28 @@
+ "totalTravelTime":"-736555.17:05:07.7754496",
+      "stop1":"00:00:01.3204987",
+      "stop2":"00:00:00.4193975",
+      "stop3":"00:00:01.5200075",
+      "stop4":"-736555.17:05:11.0353533",
+      "stop5":"-736555.17:05:07.7754496",
+
+
+            "stampOne":{  
+         "visited":true,
+         "timeNow":"2017-08-15T17:05:07.7754496Z"
+      },
+      "stampTwo":{  
+         "visited":true,
+         "timeNow":"2017-08-15T17:05:09.0959483Z"
+      },
+      "stampThree":{  
+         "visited":true,
+         "timeNow":"2017-08-15T17:05:09.5153458Z"
+      },
+      "stampFour":{  
+         "visited":true,
+         "timeNow":"2017-08-15T17:05:11.0353533Z"
+      },
+      "stampFive":{  
+         "visited":false,
+         "timeNow":"0001-01-01T00:00:00"
+      }

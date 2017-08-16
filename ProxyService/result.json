@@ -1,0 +1,132 @@
+﻿{
+  "chart": [
+    {
+      "label": "Socket",
+      "values": {
+        "q1": 625.0,
+        "q2": 166.0,
+        "q3": 673.0,
+        "whisker_low": 0.0,
+        "whisker_high": 303.0,
+        "outliers": [ 625.0, 166.0, 673.0, 303.0, 303.0 ]
+      }
+    },
+    {
+      "label": "WcfNetTcp",
+      "values": {
+        "q1": 836.0,
+        "q2": 245.0,
+        "q3": 422.0,
+        "whisker_low": 0.0,
+        "whisker_high": 466.0,
+        "outliers": [ 836.0, 245.0, 422.0, 466.0, 466.0 ]
+      }
+    },
+    {
+      "label": "Remoting",
+      "values": {
+        "q1": 244.0,
+        "q2": 615.0,
+        "q3": 899.0,
+        "whisker_low": 0.0,
+        "whisker_high": 940.0,
+        "outliers": [ 244.0, 615.0, 899.0, 940.0, 940.0 ]
+      }
+    }
+  ],
+  "standard": [
+    {
+      "totalTravelTime": "00:00:05.3033123",
+      "stop1": "00:00:01.6250122",
+      "stop2": "00:00:02.1660154",
+      "stop3": "00:00:02.6730170",
+      "stop4": "00:00:05.3033123",
+      "stop5": "00:00:05.3033123",
+      "messageId": "1e03f7bf-55c0-4ed8-a85c-d6e05698a1c7",
+      "commChannel": "Socket",
+      "messageJson": "",
+      "stampOne": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:14:57.8501416Z"
+      },
+      "stampTwo": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:14:59.4751538Z"
+      },
+      "stampThree": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:00.016157Z"
+      },
+      "stampFour": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:00.5231586Z"
+      },
+      "stampFive": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:03.1534539Z"
+      }
+    },
+    {
+      "totalTravelTime": "00:00:01.4664760",
+      "stop1": "00:00:00.8364693",
+      "stop2": "00:00:01.2454720",
+      "stop3": "00:00:01.4224854",
+      "stop4": "00:00:01.4664760",
+      "stop5": "00:00:01.4664760",
+      "messageId": "cd4f9ce4-15ac-462b-9f16-e0ec9a06a06f",
+      "commChannel": "WcfNetTcp",
+      "messageJson": "",
+      "stampOne": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:11.7063058Z"
+      },
+      "stampTwo": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:12.5427751Z"
+      },
+      "stampThree": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:12.9517778Z"
+      },
+      "stampFour": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:13.1287912Z"
+      },
+      "stampFive": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:13.1727818Z"
+      }
+    },
+    {
+      "totalTravelTime": "00:00:03.9408601",
+      "stop1": "00:00:01.2448499",
+      "stop2": "00:00:02.6158518",
+      "stop3": "00:00:03.8998627",
+      "stop4": "00:00:03.9408601",
+      "stop5": "00:00:03.9408601",
+      "messageId": "ed66441c-3c4f-412c-bdc1-599f3afc6f85",
+      "commChannel": "Remoting",
+      "messageJson": "",
+      "stampOne": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:22.9657109Z"
+      },
+      "stampTwo": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:24.2105608Z"
+      },
+      "stampThree": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:25.5815627Z"
+      },
+      "stampFour": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:26.8655736Z"
+      },
+      "stampFive": {
+        "visited": true,
+        "timeNow": "2017-08-15T21:15:26.906571Z"
+      }
+    }
+  ]
+}
