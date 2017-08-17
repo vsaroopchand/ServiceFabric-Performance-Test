@@ -1,14 +1,14 @@
 using Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Collections;
 using Newtonsoft.Json;
 using System;
 using System.Fabric;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.WebSockets;
-using Microsoft.ServiceFabric.Data.Collections;
 
 namespace ProxyService.Controllers.api
 {
@@ -69,67 +69,6 @@ namespace ProxyService.Controllers.api
 
             return Ok();
         }
-
-        /*
-
-        [HttpGet]
-        public IActionResult Start()
-        {
-            try
-            {
-                // https://github.com/sta/websocket-sharp
-                // ws://localhost:4200/Service3/
-
-                using (var ws = new WebSocket("ws://localhost:4200/Service3/"))
-                {
-                    ws.OnMessage += (sender, e) =>
-                    {
-                        if (e.IsBinary)
-                        {
-                            //Console.WriteLine("Binary package received from SVC");
-                            var rawString = Encoding.UTF8.GetString(e.RawData);
-                            //Console.WriteLine(rawString);
-                        }
-                        else if (e.IsText)
-                        {
-                            var responseMessage = JsonConvert.DeserializeObject<ServiceMessage>(e.Data);
-                        }
-                    };
-
-                    ws.Connect();
-
-                    ws.OnError += (sender, e) =>
-                    {
-                        //Console.WriteLine("ERROR ====>");
-                        Console.WriteLine(e.Message);
-                        //Console.WriteLine("<==== ERROR");
-                    };
-                    ws.OnOpen += (sender, e) =>
-                    {
-                        
-                        Console.WriteLine("Connection opened");
-                    };
-
-
-                    var message = new ServiceMessage();
-                    message.CommChannel = "Socket";
-                    message.StampOne.Visited = true;
-                    message.StampOne.TimeNow = DateTime.UtcNow;
-
-                    var jsonPackage = JsonConvert.SerializeObject(message);
-                    ws.Send(jsonPackage);
-
-                    // keep communication open allowing Service Fabric to process the message reqeust
-                    Thread.Sleep(200 * 100);
-                }
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-        */
+        
     }
 }

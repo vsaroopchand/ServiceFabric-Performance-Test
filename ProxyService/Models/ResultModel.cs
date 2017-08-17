@@ -60,16 +60,6 @@ namespace ProxyService.Models
             }
         }
 
-        //[DataMember]
-        //[JsonProperty]
-        //public TimeSpan Stop5
-        //{
-        //    get
-        //    {
-        //        return StampFive.TimeNow - StampOne.TimeNow;
-        //    }
-        //}
-
         public ResultModel InitFromServiceMessage(ServiceMessage message)
         {
             this.MessageId = message.MessageId;
@@ -83,7 +73,6 @@ namespace ProxyService.Models
         }
 
     }
-
 
     public class BoxPlotChartModel
     {
@@ -100,15 +89,8 @@ namespace ProxyService.Models
         public decimal Q2 { get; set; }
         [JsonProperty(propertyName: "Q3")]
         public decimal Q3 { get; set; }
-
         public decimal whisker_low { get; set; }
         public decimal whisker_high { get; set; }
         public List<decimal> outliers { get; set; } = new List<decimal>();
     }
-
-    /*
-     
-     
-     [{"label":"Socket","values":{"q1":819.0106,"q2":1412.5134,"q3":2153.5192,"whisker_low":0.0,"whisker_high":5009.543,"outliers":[819.0106,1412.5134,2153.5192,5009.543,5009.543]}}]
-     */
 }

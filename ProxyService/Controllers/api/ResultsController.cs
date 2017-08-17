@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using ProxyService.Models;
 using System;
 using System.Collections.Generic;
@@ -63,24 +61,11 @@ namespace ProxyService.Controllers.api
                 foreach(IGrouping<string, ResultModel> group in commGroups)
                 {
                     
-                    var count = group.Count();
-
-                    //var durationStop1 = group.Sum(t => t.Leg1.TotalMilliseconds);
-                    var averageStop1 = group.Average(t => t.Leg1.TotalMilliseconds);
-                    //var averageStop1 = ((decimal) durationStop1 / 1000) / count;
-
-                    //var durationStop2 = group.Sum(t => t.Leg2.TotalMilliseconds);
-                    //var averageStop2 = ((decimal) durationStop2 / 1000) / count;
-                    var averageStop2 = group.Average(t => t.Leg2.TotalMilliseconds);
-
-                    //var durationStop3 = group.Sum(t => t.Leg3.TotalMilliseconds);
-                    //var averageStop3 = ((decimal)durationStop3 / 1000) / count;
-                    var averageStop3 = group.Average(t => t.Leg3.TotalMilliseconds);
-
-                    //var durationStop4 = group.Sum(t => t.Leg4.TotalMilliseconds);
-                    //var averageStop4 = ((decimal) durationStop4 / 1000) / count;
-                    var averageStop4 = group.Average(t => t.Leg4.TotalMilliseconds);
-                    
+                    var count = group.Count();                    
+                    var averageStop1 = group.Average(t => t.Leg1.TotalMilliseconds);                    
+                    var averageStop2 = group.Average(t => t.Leg2.TotalMilliseconds);                    
+                    var averageStop3 = group.Average(t => t.Leg3.TotalMilliseconds);                    
+                    var averageStop4 = group.Average(t => t.Leg4.TotalMilliseconds);                    
                     var totalTime = group.Average(t => t.TotalTravelTime.TotalMilliseconds);
 
                     var dp = new BoxPlotChartModel

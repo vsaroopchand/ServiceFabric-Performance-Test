@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Threading.Tasks;
+﻿using Common;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
-using Common;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
-using Microsoft.ServiceFabric.Services.Communication.Wcf;
-using System.Threading;
+using System;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Service4
 {
@@ -78,10 +78,6 @@ namespace Service4
 
             return proxyUrl;
         }
-
-        /*
-        protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners() { return new[] { new ServiceReplicaListener(this.CreateServiceRemotingListener) }; }
-        */
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {

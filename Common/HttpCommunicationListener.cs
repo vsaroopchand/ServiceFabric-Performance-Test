@@ -1,13 +1,12 @@
 ﻿using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using System;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Net;
-using System.Net.WebSockets;
-using System.IO;
 using System.Fabric;
 using System.Fabric.Description;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Common
 {
