@@ -17,7 +17,7 @@ export class BaseService<T> {
     constructor(protected http: Http, @Inject(BaseEndpoint) protected baseApiEndpoint) {
 
         this.headers = new Headers({ 'Content-Type': 'application/json' });
-        //this.headers.append('Access-Control-Allow-Origin', 'http://localhost:4200');
+        this.headers.append('Access-Control-Allow-Origin', 'http://localhost:4200');
 
     }
 
@@ -28,7 +28,7 @@ export class BaseService<T> {
             }).catch(this.handleError);
     }
 
-    get(id: number): Observable<any> {
+    get(id: number | string): Observable<any> {
         return this.http.get(this.baseApiEndpoint + '/' + id, { headers: this.headers }).map((value, i) => {
             return <T>value.json()
         })

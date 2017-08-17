@@ -8,6 +8,9 @@ namespace Common
     public class ServiceMessage
     {
         [DataMember]
+        public string SessionId { get; set; }
+
+        [DataMember]
         public string MessageId { get; set; } = Guid.NewGuid().ToString();
         [DataMember]
         public string CommChannel { get; set; } = string.Empty;

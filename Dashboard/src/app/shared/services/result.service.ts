@@ -11,8 +11,8 @@ export class ResultService extends BaseService<any>{
         super(http, baseApiEndpoint + '/api/results');
     }
 
-    getBoxPlotData(): Observable<any> {
-        return this.http.get(this.baseApiEndpoint + '/boxplot/', { headers: this.headers }).map(
+    getBoxPlotData(id: string): Observable<any> {
+        return this.http.get(this.baseApiEndpoint + '/boxplot/' + id, { headers: this.headers }).map(
             (res: Response) => {
                 return res.json() as any[];
             }).catch(this.handleError);

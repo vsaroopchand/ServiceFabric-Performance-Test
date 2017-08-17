@@ -26,8 +26,8 @@ namespace ProxyService.Controllers.api
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Start()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Start(string id)
         {
             ClientWebSocket cws = new ClientWebSocket();
             byte[] receiveBuffer = new byte[102400];
@@ -40,6 +40,7 @@ namespace ProxyService.Controllers.api
                 {
                     var message = new ServiceMessage();
                     message.CommChannel = "Socket";
+                    message.SessionId = id;
                     message.StampOne.Visited = true;
                     message.StampOne.TimeNow = DateTime.UtcNow;
                     var messageJson = JsonConvert.SerializeObject(message);

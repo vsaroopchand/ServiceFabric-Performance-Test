@@ -23,13 +23,13 @@ namespace ProxyService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddCors(setup => {
                 setup.AddPolicy("open", policyBuilder =>
                 {
                     policyBuilder.AllowAnyHeader();
                     policyBuilder.AllowAnyMethod();
                     policyBuilder.AllowAnyOrigin();
+                    policyBuilder.WithOrigins("http://localhost:4200", "*");
                 });
             });
 
@@ -39,10 +39,19 @@ namespace ProxyService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+
+            app.UseCors("open");
+
+            //app.UseCors(builder =>
+            //{
+            //    builder.AllowAnyHeader();
+            //    builder.AllowAnyMethod();
+            //    builder.AllowAnyOrigin();
+            //});
+
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseCors("open");
             app.UseMvc();
         }
     }

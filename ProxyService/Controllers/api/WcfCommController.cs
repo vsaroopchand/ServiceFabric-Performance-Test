@@ -28,8 +28,8 @@ namespace ProxyService.Controllers.api
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Start()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Start(string id)
         {
             try
             {
@@ -40,6 +40,7 @@ namespace ProxyService.Controllers.api
                
                 var message = new ServiceMessage();
                 message.CommChannel = "WcfNetTcp";
+                message.SessionId = id;
                 message.StampOne.Visited = true;
                 message.StampOne.TimeNow = DateTime.UtcNow;
                 var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");

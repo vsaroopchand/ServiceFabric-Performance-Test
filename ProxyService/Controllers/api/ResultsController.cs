@@ -28,12 +28,10 @@ namespace ProxyService.Controllers.api
             _context = context;
         }
 
-        [HttpGet("Standard")]
+        [HttpGet("All")]
         public async Task<IActionResult> GetAll()
         {
-            // chart
-            // https://github.com/krispo/ng2-nvd3/blob/gh-pages/app/defs.ts
-
+    
             try
             {
                 var results = await GetResultsAsync();
@@ -47,15 +45,19 @@ namespace ProxyService.Controllers.api
         }
 
 
-        [HttpGet("BoxPlot")]
-        public async Task<IActionResult> BoxPlotResult()
+        [HttpGet("boxplot/{id}")]
+        public async Task<IActionResult> BoxPlotResult(string id)
         {
             var dataPoints = new List<BoxPlotChartModel>();
 
             try
             {
                 var results = await GetResultsAsync();
-                var model = results.Select(t => { return new ResultModel().InitFromServiceMessage(t); });
+                var model = results
+                                .Where(t => t.SessionId.Equals(id))
+                                .Select(t => {
+                                    return new ResultModel().InitFromServiceMessage(t);
+                                });
 
                 var commGroups = model.GroupBy(t => t.CommChannel);
                 foreach(IGrouping<string, ResultModel> group in commGroups)

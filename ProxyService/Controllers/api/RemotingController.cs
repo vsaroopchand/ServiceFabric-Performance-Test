@@ -30,13 +30,14 @@ namespace ProxyService.Controllers.api
         }
 
 
-        [HttpGet("start")]
-        public async Task<IActionResult> Start()
+        [HttpGet("start/{id}")]
+        public async Task<IActionResult> Start(string id)
         {
             try
             {
                 var message = new ServiceMessage();
                 message.CommChannel = "Remoting";
+                message.SessionId = id;
                 message.StampOne.Visited = true;
                 message.StampOne.TimeNow = DateTime.UtcNow;
 
