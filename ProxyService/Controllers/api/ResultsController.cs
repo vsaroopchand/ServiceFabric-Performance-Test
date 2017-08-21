@@ -73,14 +73,14 @@ namespace ProxyService.Controllers.api
                         label = group.Key,
                         values = new BoxPlotChartValues
                         {
-                            Q1 = (decimal)averageStop1 / 1000,
-                            Q2 = (decimal)averageStop2 / 1000,
-                            Q3 = (decimal)averageStop3 / 1000,
+                            Q1 = (decimal)averageStop1,
+                            Q2 = (decimal)averageStop2,
+                            Q3 = (decimal)averageStop3,
                             whisker_low = 0.0M,
-                            whisker_high = (decimal)totalTime / 1000,
+                            whisker_high = (decimal)totalTime,
                             outliers = new List<decimal>
                             {
-                                (decimal)averageStop1 / 1000, (decimal)averageStop2 / 1000, (decimal)averageStop3 / 1000, (decimal)averageStop4 / 1000, (decimal)totalTime / 1000
+                                (decimal)averageStop1, (decimal)averageStop2, (decimal)averageStop3, (decimal)averageStop4, (decimal)totalTime
                             }
                         }
                     };

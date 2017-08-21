@@ -14,7 +14,7 @@ export class WcfCommunicationService extends BaseService<any>{
     get(id: string): Observable<any> {
         return this.http.get(this.baseApiEndpoint + '/' + id, { headers: this.headers }).map(
             (res: Response) => {
-                return res.json() as any[];
+                return res.json() as any;
             }).catch(this.handleError);
     }
 }

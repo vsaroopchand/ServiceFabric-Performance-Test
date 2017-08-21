@@ -60,7 +60,7 @@ namespace ProxyService.Controllers.api
 
                 }
 
-                return Ok();
+                return Ok(new { id = id });
             }
             catch(Exception e)
             {

@@ -2,6 +2,7 @@ using Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
+using Microsoft.ServiceFabric.Services.Client;
 using Newtonsoft.Json;
 using System;
 using System.Fabric;
@@ -18,6 +19,7 @@ namespace ProxyService.Controllers.api
         private readonly FabricClient _client;
         private readonly IReliableStateManager _manager;
         private readonly StatefulServiceContext _context;
+        private readonly ServicePartitionResolver servicePartitionResolver = ServicePartitionResolver.GetDefault();
 
         public SocketCommController(IReliableStateManager manager, FabricClient fabricClient, StatefulServiceContext context)
         {
@@ -34,7 +36,8 @@ namespace ProxyService.Controllers.api
 
             try
             {
-                var endpoint = $"ws://localhost:{Constants.SVC2_WS_PORT}/Service2/";
+                var endpoint = await Utils.GetSocketEndpoint("Service2", this._context);
+
                 await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
                 if(cws.State == WebSocketState.Open)
                 {
@@ -67,8 +70,24 @@ namespace ProxyService.Controllers.api
                 }
             }
 
-            return Ok();
+            return Ok(new { id = id });
         }
-        
+
+
+        [HttpGet("endpoints/{id}")]
+        public async Task<IActionResult> GetSocketEndpoint(string id)
+        {
+            try
+            {                
+                var address = await Utils.GetSocketEndpoint(id, this._context);
+
+                return Ok(address);
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
     }
 }

@@ -11,7 +11,7 @@
     <Parameter Name="Service3_MinReplicaSetSize" Value="3" />
     <Parameter Name="Service3_TargetReplicaSetSize" Value="3" />
     <Parameter Name="ProxyService_PartitionCount" Value="1" />
-    <Parameter Name="ProxyService_MinReplicaSetSize" Value="0" />
-    <Parameter Name="ProxyService_TargetReplicaSetSize" Value="0" />
+    <Parameter Name="ProxyService_MinReplicaSetSize" Value="3" />
+    <Parameter Name="ProxyService_TargetReplicaSetSize" Value="3" />
   </Parameters>
 </Application>

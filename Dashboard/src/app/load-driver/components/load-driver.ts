@@ -28,6 +28,7 @@ import { FormGroup } from '@angular/forms';
 export class LoadDriverComponent implements OnChanges {
 
     @Input() form: FormGroup;
+    @Input() inProgress = false;
     @Output('onStartCallback') onStartCallback: EventEmitter<any> = new EventEmitter<any>();
     @Output('onResetCallback') onResetCallback: EventEmitter<any> = new EventEmitter<any>();
 
@@ -50,6 +51,6 @@ export class LoadDriverComponent implements OnChanges {
     }
 
     get allowStart() {
-        return this.form.valid;
+        return this.form.valid && !this.inProgress;
     }
 }

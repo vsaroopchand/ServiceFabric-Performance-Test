@@ -78,7 +78,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
     timerHandle: any;
 
     // yScale dropdown selector
-    yScaleMax = 3;
+    yScaleMax = 1;
     yScaleRange: Array<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     // chart options
@@ -92,7 +92,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
     options: any = {
         chart: {
             type: 'boxPlotChart',
-            height: 450,
+            height: 350,
             margin: {
                 top: 20,
                 right: 20,
@@ -103,24 +103,40 @@ export class BoxPlotChart implements OnInit, OnDestroy {
                 axisLabel: 'Commication Stack',
             },
             yAxis: {
-                axisLabel: 'Call Duration (seconds)',
+                axisLabel: 'Call Duration (ms)',
                 axisLabelDistance: -10
             },
             tooltip: {
                 valueFormatter: function (d) {
-                    // return 'what is this';
-                    return d;
+                    if (isNaN(d)) {
+                        return d;
+                    }
+                    else {
+                        return parseFloat(d).toFixed(0);
+                    }
                 },
                 keyFormatter: function (d) {
-                    //return 'Key';
-                    return d;
+                    switch (d) {
+                        case 'Q1':
+                            return 'Leg1';
+
+                        case 'Q2':
+                            return 'Leg2';
+
+                        case 'Q3':
+                            return 'Leg3';
+
+                        default:
+                            return d;
+                    }
+
                 }
             },
             color: ['#31a354', '#de2d26', '#2b8cbe', '#756bb1', '#99d8c9'],
             x: function (d) { return d.label; },
             y: function (d) { return d.values.S1; },
             maxBoxWidth: 200,
-            yDomain: [0, this.yScaleMax]
+            yDomain: [0, 1000]
         }
     };
     data: any = [];
@@ -148,6 +164,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
 
     autoRefreshChanged() {
         if (this.autoRefresh) {
+            this.loadChartData();
             this.timerHandle = setInterval(() => {
                 this.loadChartData();
             }, 5000);
@@ -161,7 +178,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
     }
 
     setYScaleMax() {
-        this.options.chart.yDomain = [0, this.yScaleMax];
+        this.options.chart.yDomain = [0, this.yScaleMax * 1000];
     }
 
     reset(e: any) {

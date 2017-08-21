@@ -52,7 +52,7 @@ namespace ProxyService.Controllers.api
                 var service = ServiceProxy.Create<IServiceTwo>(new Uri(Endpoint), partitionKey);
                 await service.VisitByRemotingAsync(message);
 
-                return Ok();
+                return Ok(new { id = id});
             }
             catch(Exception e)
             {
@@ -133,6 +133,40 @@ namespace ProxyService.Controllers.api
                 return Ok(partitionIds);
             }
             catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
+        [HttpGet("endpoints/{id}")]
+        public async Task<IActionResult> GetServiceEndpoints(string id)
+        {
+            try
+            {
+                Dictionary<string, ResolvedServiceEndpoint> partitionEndpointDictionary = new Dictionary<string, ResolvedServiceEndpoint>();
+                List<string> endpoints = new List<string>();
+
+                var serviceUri = this._context.CodePackageActivationContext.ApplicationName + "/" + id;
+                var partitionList = await this._client.QueryManager.GetPartitionListAsync(new Uri(serviceUri));
+
+                foreach (var partition in partitionList)
+                {
+                    long partitionKey = ((Int64RangePartitionInformation)partition.PartitionInformation).HighKey;
+                    var resolvedPartition = await servicePartitionResolver.ResolveAsync(new Uri(serviceUri), new ServicePartitionKey(partitionKey), CancellationToken.None);
+                    var endpoint = resolvedPartition.GetEndpoint();
+                    
+                    foreach(var ep in resolvedPartition.Endpoints)
+                    {
+                        endpoints.Add(ep.Address);
+                    }
+
+                    //partitionEndpointDictionary.Add(partition.PartitionInformation.Id.ToString(), endpoint);
+                }              
+
+                return Ok(endpoints);
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }

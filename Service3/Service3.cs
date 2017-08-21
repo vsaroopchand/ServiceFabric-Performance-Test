@@ -78,8 +78,11 @@ namespace Service3
             try
             {
                 cws = new ClientWebSocket();
-                await cws.ConnectAsync(new Uri(Service4SocketUri), CancellationToken.None);
-                
+
+                var endpoint = await Utils.GetSocketEndpoint("Service4", this.Context);
+
+                await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
+
                 var messageJson = JsonConvert.SerializeObject(message);
 
                 Task receiverTask = cws.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
@@ -140,5 +143,6 @@ namespace Service3
                 }
             }
         }
+
     }
 }

@@ -9,13 +9,14 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 @Component({
     selector: 'my-load-driver-container',
     template: `
-        <my-load-driver [form]="form" (onStartCallback)="start(e)" (onResetCallback)="reset(e)"></my-load-driver>
+        <my-load-driver [form]="form" [inProgress]="inProgress" (onStartCallback)="start(e)" (onResetCallback)="reset(e)"></my-load-driver>
     `
 })
 export class LoadDriverContainer implements OnInit {
 
     form: FormGroup;
     @Output('onResetCallback') onResetCallback: EventEmitter<any> = new EventEmitter<any>();
+    inProgress = false;
 
     constructor(private fb: FormBuilder,
         private wcf: WcfCommunicationService,
@@ -38,12 +39,13 @@ export class LoadDriverContainer implements OnInit {
     }
 
     start(e: any) {
-        const requestCount = +this.form.get('requests').value;
+        let requestCount = +this.form.get('requests').value;
         const range = Observable.range(1, requestCount);
         const currentSession = this.sessionService.currentSession;
 
+        this.inProgress = true;
 
-        var source = Observable.from(range)
+        const source = Observable.from(range)
             .flatMap(function (item) {
                 return Observable.of(item);
             }).throttle((t) => {
@@ -51,21 +53,28 @@ export class LoadDriverContainer implements OnInit {
             });
 
 
-        var subscription = source.subscribe(
+        source.subscribe(
             (x) => {
-                console.log('Next: %s', x);
 
-                Observable.merge(this.wcf.get(currentSession), this.remoting.get(currentSession), this.socket.get(currentSession)).subscribe(res => {
-                    console.log('merged response');
-                    console.log(res);
-                });
-            },
-            function (err) {
-                console.log('Error: %s', err);
-            },
-            function () {
-                console.log('Completed');
+
+                Observable.merge(
+                    this.wcf.get(currentSession),
+                    this.remoting.get(currentSession),
+                    this.socket.get(currentSession),
+                    3)
+                    .subscribe(res => {
+                        // do nothing
+                    },
+                    (error) => {
+                        console.log('error');
+                        console.log(error);
+                    },
+                    () => {
+                        requestCount--;
+                        if (requestCount === 0) {
+                            this.inProgress = false;
+                        }
+                    });
             });
-
     }
 }
