@@ -2,6 +2,8 @@ import { SessionService } from './../../shared/services/session.service';
 import { RemotingCommunicationService } from './../../shared/services/remoting-comm.service';
 import { SocketCommunicationService } from './../../shared/services/socket-comm.service';
 import { WcfCommunicationService } from './../../shared/services/wcf-comm.service';
+import { ServiceBusCommunicationService } from './../../shared/services/servicebus-comm.service';
+
 import { Observable } from 'rxjs/Observable';
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -22,6 +24,7 @@ export class LoadDriverContainer implements OnInit {
         private wcf: WcfCommunicationService,
         private socket: SocketCommunicationService,
         private remoting: RemotingCommunicationService,
+        private serviceBus: ServiceBusCommunicationService,
         private sessionService: SessionService) {
     }
 
@@ -52,16 +55,15 @@ export class LoadDriverContainer implements OnInit {
                 return Observable.of(100);
             });
 
-
         source.subscribe(
             (x) => {
-
 
                 Observable.merge(
                     this.wcf.get(currentSession),
                     this.remoting.get(currentSession),
                     this.socket.get(currentSession),
-                    3)
+                    this.serviceBus.get(currentSession),
+                    4)
                     .subscribe(res => {
                         // do nothing
                     },

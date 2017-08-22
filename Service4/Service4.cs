@@ -94,7 +94,8 @@ namespace Service4
                 new ServiceReplicaListener((ctx) =>
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
-                }, "WebSocket")
+                }, "WebSocket"),
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError); }, "PubSub")
             };
         }
 
@@ -120,6 +121,16 @@ namespace Service4
                 }
             }
         }
-    }
 
+        void ProcessTopicMessage(ServiceMessage message)
+        {
+            VisitByRemotingAsync(message).GetAwaiter().GetResult();
+            ServiceBusSenderClient.Send("end", message, LogError);
+        }
+
+        void LogError(Exception e)
+        {
+            ServiceEventSource.Current.ServiceMessage(this.Context, e.Message);
+        }
+    }
 }

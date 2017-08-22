@@ -17,5 +17,10 @@ namespace Common
 
         public const string SVC_WS_HOST = "ws://localhost:";
         public const string SVC_WS_HOST_REMOTE = "ws://??:";
+
+        public const string SB_CONFIG_SECTION = "SBConfig";
+        public const string SB_CONN_STRING = "SasToken";
+        public const string SB_TOPIC = "Topic";
+        public const string SB_SUBSCRIPTION = "Subscription";
     }
 }

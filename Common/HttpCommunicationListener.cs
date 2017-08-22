@@ -70,7 +70,7 @@ namespace Common
             return Task.FromResult(this.publicAddress);
         }
     }
-    public class WebSocketListener : IDisposable
+    public class WebSocketListener : System.IDisposable
     {
         // https://github.com/paulbatum/WebSocket-Samples
         private readonly string prefix;

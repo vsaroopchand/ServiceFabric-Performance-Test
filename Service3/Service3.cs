@@ -115,7 +115,8 @@ namespace Service3
                 new ServiceReplicaListener((ctx) =>
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
-                }, "WebSocket")
+                }, "WebSocket"),
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError); }, "PubSub")
             };
         }
                 
@@ -142,6 +143,18 @@ namespace Service3
                     callback?.Invoke(Encoding.UTF8.GetBytes(e.Message));
                 }
             }
+        }
+
+        void ProcessTopicMessage(ServiceMessage message)
+        {
+            message.StampThree.Visited = true;
+            message.StampThree.TimeNow = DateTime.UtcNow;
+            ServiceBusSenderClient.Send("service4", message, LogError);
+        }
+
+        void LogError(Exception e)
+        {
+            ServiceEventSource.Current.ServiceMessage(this.Context, e.Message);
         }
 
     }
