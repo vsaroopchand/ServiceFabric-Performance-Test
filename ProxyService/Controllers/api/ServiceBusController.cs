@@ -63,12 +63,12 @@ namespace ProxyService.Controllers.api
             message.StampOne.Visited = true;
             message.StampOne.TimeNow = DateTime.UtcNow;
 
-            var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
-            using (var tx = _manager.CreateTransaction())
-            {
-                await storage.AddAsync(tx, message.MessageId, message);
-                await tx.CommitAsync();
-            }
+            //var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
+            //using (var tx = _manager.CreateTransaction())
+            //{
+            //    await storage.AddAsync(tx, message.MessageId, message);
+            //    await tx.CommitAsync();
+            //}
 
             ServiceBusSenderClient.Send("service2", message, (e) => { ServiceEventSource.Current.ServiceMessage(_context, e.Message); });
             return Ok(new { id = id });

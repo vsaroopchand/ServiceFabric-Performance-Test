@@ -9,7 +9,7 @@
 
   <!-- Add your custom configuration sections and parameters here. -->
   <Section Name="SBConfig">
-    <Parameter Name="SasToken" Value="ENTER YOUR SAS TOKEN" />
+    <Parameter Name="SasToken" Value="" />
     <Parameter Name="Topic" Value="service4" />
     <Parameter Name="Subscription" Value="default" />
   </Section>

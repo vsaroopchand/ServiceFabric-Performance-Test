@@ -79,7 +79,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
 
     // yScale dropdown selector
     yScaleMax = 1;
-    yScaleRange: Array<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    yScaleRange: Array<number> = [.1, .2, .3, .4, .4, .5, .6, .7, .8, .9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     // chart options
     selectedView: any = 1;
@@ -100,7 +100,7 @@ export class BoxPlotChart implements OnInit, OnDestroy {
                 left: 50
             },
             xAxis: {
-                axisLabel: 'Commication Stack',
+                axisLabel: 'Communication Stack',
             },
             yAxis: {
                 axisLabel: 'Call Duration (ms)',

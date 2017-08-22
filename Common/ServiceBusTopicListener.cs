@@ -164,14 +164,14 @@ namespace Common
     {
         public static void Send(string topic, ServiceMessage message, Action<Exception> loggerAction)
         {
-
-            var connString = @"ENTER YOUR SAS TOKEN";
+            //todo: move to configuration? keyvault?
+            var connString = @"";
             var sbSender = new ServiceBusTopicSender(connString, topic, loggerAction);
 
             try
             {
                 sbSender.SendServiceMessageAsync(message).GetAwaiter().GetResult();               
-            }         
+            }                 
             finally
             {
                 sbSender.Close();

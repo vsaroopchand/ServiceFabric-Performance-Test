@@ -28,7 +28,14 @@ namespace Service4
         private const string AppPrefix = "Service4";
         public Service4(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (!this.StateManager.TryAddStateSerializer(new JsonNetServiceMessageSerializer()))
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+
+            }
+        }
 
         public async Task VisitByRemotingAsync(ServiceMessage message)
         {

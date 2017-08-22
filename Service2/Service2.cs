@@ -29,10 +29,19 @@ namespace Service2
         private const string SocketEndpoint = "SocketEndpoint";
         private const string AppPrefix = "Service2";
         private readonly string Service3SocketUri = $"ws://localhost:{Constants.SVC3_WS_PORT}/Service3/";
+        private ClientWebSocket cws;
 
         public Service2(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (!this.StateManager.TryAddStateSerializer(new JsonNetServiceMessageSerializer()))
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+
+            }
+        }
 
         public async Task VisitByRemotingAsync(ServiceMessage message)
         {
@@ -72,16 +81,23 @@ namespace Service2
 
         private async Task VisitSocketAsync(ServiceMessage message)
         {
-            ClientWebSocket cws = new ClientWebSocket();
+            
             byte[] receiveBuffer = new byte[102400];
 
             try
             {
-                cws = new ClientWebSocket();
+                if(cws == null)
+                {
+                    cws = new ClientWebSocket();
+                    var endpoint = await Utils.GetSocketEndpoint("Service3", this.Context);
+                    await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
 
-                var endpoint = await Utils.GetSocketEndpoint("Service3", this.Context);
+                }
+                //cws = new ClientWebSocket();
 
-                await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
+                //var endpoint = await Utils.GetSocketEndpoint("Service3", this.Context);
+
+                //await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
 
                 var messageJson = JsonConvert.SerializeObject(message);
 
@@ -90,13 +106,18 @@ namespace Service2
 
                 await Task.WhenAll(receiverTask, sendTask);
             }
-            finally
+            catch(Exception e)
             {
-                if (cws?.State == WebSocketState.Open || cws?.State == WebSocketState.Connecting)
-                {
-                    await cws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
-                }
+                LogError(e);
             }
+
+            //finally
+            //{
+            //    if (cws?.State == WebSocketState.Open || cws?.State == WebSocketState.Connecting)
+            //    {
+            //        await cws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            //    }
+            //}
 
         }
 
@@ -118,6 +139,34 @@ namespace Service2
                 }, "WebSocket"),
                 new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError); }, "PubSub")
             };
+        }
+
+        //protected override async Task OnOpenAsync(ReplicaOpenMode openMode, CancellationToken cancellationToken)
+        //{                     
+        //    await base.OnOpenAsync(openMode, cancellationToken);
+        //}
+
+        protected override async Task OnCloseAsync(CancellationToken cancellationToken)
+        {
+            if (cws?.State == WebSocketState.Open || cws?.State == WebSocketState.Connecting)
+            {
+                await cws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            }
+
+            await base.OnCloseAsync(cancellationToken);
+        }
+
+        protected override async Task OnChangeRoleAsync(ReplicaRole newRole, CancellationToken cancellationToken)
+        {
+            if(newRole != ReplicaRole.Primary)
+            {
+                if (cws?.State == WebSocketState.Open || cws?.State == WebSocketState.Connecting)
+                {
+                    await cws.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                }
+            }
+
+            await base.OnChangeRoleAsync(newRole, cancellationToken);
         }
 
         void ProcessWsRequest(byte[] data, CancellationToken token, Action<byte[]> callback)

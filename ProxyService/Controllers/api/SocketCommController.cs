@@ -39,28 +39,27 @@ namespace ProxyService.Controllers.api
                 var endpoint = await Utils.GetSocketEndpoint("Service2", this._context);
 
                 await cws.ConnectAsync(new Uri(endpoint), CancellationToken.None);
-                if(cws.State == WebSocketState.Open)
-                {
+                //if(cws.State == WebSocketState.Open)
+                //{
                     var message = new ServiceMessage();
                     message.CommChannel = "Socket";
                     message.SessionId = id;
                     message.StampOne.Visited = true;
                     message.StampOne.TimeNow = DateTime.UtcNow;
                     var messageJson = JsonConvert.SerializeObject(message);
-
-                    var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
-                    using(var tx = _manager.CreateTransaction())
-                    {
-                        await storage.AddAsync(tx, message.MessageId, message);
-                        await tx.CommitAsync();
-                    }
                                       
                     Task receiverTask = cws.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
                     Task sendTask = cws.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(messageJson)), WebSocketMessageType.Binary, true, CancellationToken.None);
 
-                    await Task.WhenAll(receiverTask, sendTask);
-
-                }
+                    await Task.WhenAll(receiverTask, sendTask).ContinueWith(async t => {
+                        //var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
+                        //using (var tx = _manager.CreateTransaction())
+                        //{
+                        //    await storage.AddAsync(tx, message.MessageId, message);
+                        //    await tx.CommitAsync();
+                        //}
+                    });                  
+                //}
             }
             finally
             {

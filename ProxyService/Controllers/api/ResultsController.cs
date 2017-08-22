@@ -52,10 +52,23 @@ namespace ProxyService.Controllers.api
             {
                 var results = await GetResultsAsync();
                 var model = results
-                                .Where(t => t.SessionId.Equals(id))
+                                .Where(t => t.SessionId.Equals(id) && t.StampFive.Visited)
                                 .Select(t => {
                                     return new ResultModel().InitFromServiceMessage(t);
                                 });
+
+                var lostPackets = results
+                                .Where(t => t.SessionId.Equals(id) && !t.StampFive.Visited)
+                                .Select(t => {
+                                    return new ResultModel().InitFromServiceMessage(t);
+                                }).ToList();
+
+                if (lostPackets.Count > 0)
+                {
+                    // log the error
+                    //ServiceEventSource.Current.ServiceMessage(serviceContext, $"Starting Kestrel on {url}");
+                    ServiceEventSource.Current.ServiceMessage(_context, $"Losing message packets on {lostPackets.First().CommChannel} - {lostPackets.First().SessionId}");
+                }
 
                 var commGroups = model.GroupBy(t => t.CommChannel);
                 foreach(IGrouping<string, ResultModel> group in commGroups)

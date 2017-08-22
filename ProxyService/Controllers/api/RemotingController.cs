@@ -41,12 +41,12 @@ namespace ProxyService.Controllers.api
                 message.StampOne.Visited = true;
                 message.StampOne.TimeNow = DateTime.UtcNow;
 
-                var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
-                using (var tx = _manager.CreateTransaction())
-                {
-                    await storage.AddAsync(tx, message.MessageId, message);
-                    await tx.CommitAsync();
-                }
+                //var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
+                //using (var tx = _manager.CreateTransaction())
+                //{
+                //    await storage.AddAsync(tx, message.MessageId, message);
+                //    await tx.CommitAsync();
+                //}
 
                 var partitionKey = new ServicePartitionKey(1);
                 var service = ServiceProxy.Create<IServiceTwo>(new Uri(Endpoint), partitionKey);
@@ -67,19 +67,23 @@ namespace ProxyService.Controllers.api
 
             try
             {
+                message.StampFive.Visited = true;
+                message.StampFive.TimeNow = DateTime.UtcNow;
+
                 var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
                 using (var tx = _manager.CreateTransaction())
                 {                    
                     await storage.AddOrUpdateAsync(tx, message.MessageId, message, (k, m) =>
                     {
                         //m.StampOne = message.StampOne;
-                        m.StampTwo = message.StampTwo;
-                        m.StampThree = message.StampThree;
-                        m.StampFour = message.StampFour;
+                        //m.StampTwo = message.StampTwo;
+                        //m.StampThree = message.StampThree;
+                        //m.StampFour = message.StampFour;
 
-                        m.StampFive.Visited = true;
-                        m.StampFive.TimeNow = DateTime.UtcNow;
-                        return m;
+                        //m.StampFive.Visited = true;
+                        //m.StampFive.TimeNow = DateTime.UtcNow;
+                        //return m;
+                        return message;
                     });
 
                     await tx.CommitAsync();

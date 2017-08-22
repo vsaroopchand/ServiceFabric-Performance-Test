@@ -21,7 +21,15 @@ namespace ProxyService
     {
         public ProxyService(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (!this.StateManager.TryAddStateSerializer(new Common.JsonNetServiceMessageSerializer()))
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+
+            }
+        }
 
         /// <summary>
         /// Optional override to create listeners (like tcp, http) for this service instance.

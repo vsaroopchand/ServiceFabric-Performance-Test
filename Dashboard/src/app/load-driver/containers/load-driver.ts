@@ -59,11 +59,11 @@ export class LoadDriverContainer implements OnInit {
             (x) => {
 
                 Observable.merge(
-                    this.wcf.get(currentSession),
-                    this.remoting.get(currentSession),
-                    this.socket.get(currentSession),
-                    this.serviceBus.get(currentSession),
-                    4)
+                        this.wcf.get(currentSession),
+                        this.remoting.get(currentSession),
+                        this.socket.get(currentSession),
+                        this.serviceBus.get(currentSession),
+                    3)
                     .subscribe(res => {
                         // do nothing
                     },
