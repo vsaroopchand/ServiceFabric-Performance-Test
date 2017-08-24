@@ -91,6 +91,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="HttpCommunicationListener.cs" />
     <Compile Include="ServiceBusTopicListener.cs" />
+    <Compile Include="ServiceBusTopicSender.cs" />
     <Compile Include="SvcOneWcfCommunicationClient.cs" />
     <Compile Include="IService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

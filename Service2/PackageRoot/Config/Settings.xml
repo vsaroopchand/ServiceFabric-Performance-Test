@@ -11,8 +11,8 @@
   
   <Section Name="SBConfig">
     <Parameter Name="SasToken" Value="" />
-    <Parameter Name="Topic" Value="service2" />
-    <Parameter Name="Subscription" Value="default" />
+    <Parameter Name="Topic" Value="svc2" />
+    <Parameter Name="Subscription" Value="express" />
   </Section>
   
 </Settings>

@@ -1,10 +1,10 @@
 ﻿using Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Data;
-using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using System;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Threading.Tasks;
 
 namespace ProxyService.Controllers.api
@@ -29,48 +29,19 @@ namespace ProxyService.Controllers.api
         [HttpGet("{id}")]
         public async Task<IActionResult> Start(string id)
         {
-            //var connString = @"Endpoint=sb://sfperf.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SeyAnVX09m8LZyvdXioxg9SElIpQBl882uz6DBBbBMo=";          
-            //var sbSender = new ServiceBusTopicSender(connString, "service2", (e) =>
-            //{
-
-            //    ServiceEventSource.Current.ServiceMessage(_context, e.Message);
-            //});
-
-            //try
-            //{                            
-            //    var message = new ServiceMessage();
-            //    message.CommChannel = "PubSub";
-            //    message.SessionId = id;
-            //    message.StampOne.Visited = true;
-            //    message.StampOne.TimeNow = DateTime.UtcNow;
-            //    sbSender.SendServiceMessageAsync(message).GetAwaiter().GetResult();
-
-            //    return Ok(new { id = id });
-            //}
-            //catch(Exception e)
-            //{
-            //    return BadRequest(e.Message);
-            //}
-
-            //finally
-            //{
-            //    sbSender.Close();
-            //}
-
             var message = new ServiceMessage();
             message.CommChannel = "PubSub";
             message.SessionId = id;
             message.StampOne.Visited = true;
             message.StampOne.TimeNow = DateTime.UtcNow;
 
-            //var storage = await _manager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
-            //using (var tx = _manager.CreateTransaction())
-            //{
-            //    await storage.AddAsync(tx, message.MessageId, message);
-            //    await tx.CommitAsync();
-            //}
+            ConfigurationPackage configPackage = this._context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            ConfigurationSection configSection = configPackage.Settings.Sections[Constants.SB_CONFIG_SECTION];
+            var connString = (configSection.Parameters[Constants.SB_CONN_STRING]).Value;
+            var topicName = (configSection.Parameters[Constants.SB_TOPIC]).Value;
 
-            ServiceBusSenderClient.Send("service2", message, (e) => { ServiceEventSource.Current.ServiceMessage(_context, e.Message); });
+            await ServiceBusSenderClient2.Send(connString, topicName, message, (e) => { ServiceEventSource.Current.ServiceMessage(_context, e.Message); });
+
             return Ok(new { id = id });
         }
     }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Common
+﻿namespace Common
 {
     public static class Constants
     {
@@ -22,5 +16,6 @@ namespace Common
         public const string SB_CONN_STRING = "SasToken";
         public const string SB_TOPIC = "Topic";
         public const string SB_SUBSCRIPTION = "Subscription";
+
     }
 }

@@ -10,7 +10,7 @@
   <!-- Add your custom configuration sections and parameters here. -->
   <Section Name="SBConfig">
     <Parameter Name="SasToken" Value="" />
-    <Parameter Name="Topic" Value="service3" />
-    <Parameter Name="Subscription" Value="default" />
+    <Parameter Name="Topic" Value="svc3" />
+    <Parameter Name="Subscription" Value="express" />
   </Section>
 </Settings>

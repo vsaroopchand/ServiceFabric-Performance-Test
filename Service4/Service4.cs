@@ -10,6 +10,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -102,7 +103,7 @@ namespace Service4
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
-                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError); }, "PubSub")
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub")
             };
         }
 
@@ -132,7 +133,14 @@ namespace Service4
         void ProcessTopicMessage(ServiceMessage message)
         {
             VisitByRemotingAsync(message).GetAwaiter().GetResult();
-            ServiceBusSenderClient.Send("end", message, LogError);
+
+            ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            ConfigurationSection configSection = configPackage.Settings.Sections[Constants.SB_CONFIG_SECTION];
+            var connString = (configSection.Parameters[Constants.SB_CONN_STRING]).Value;
+
+            ServiceBusSenderClient2.Send(connString, "end", message, LogError)
+                .GetAwaiter()
+                .GetResult();
         }
 
         void LogError(Exception e)

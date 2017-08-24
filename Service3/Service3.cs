@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -130,7 +131,7 @@ namespace Service3
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
-                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError); }, "PubSub")
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub")
             };
         }
 
@@ -156,7 +157,6 @@ namespace Service3
 
             await base.OnChangeRoleAsync(newRole, cancellationToken);
         }
-
 
         void ProcessWsRequest(byte[] data, CancellationToken token, Action<byte[]> callback)
         {
@@ -187,7 +187,14 @@ namespace Service3
         {
             message.StampThree.Visited = true;
             message.StampThree.TimeNow = DateTime.UtcNow;
-            ServiceBusSenderClient.Send("service4", message, LogError);
+
+            ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            ConfigurationSection configSection = configPackage.Settings.Sections[Constants.SB_CONFIG_SECTION];
+            var connString = (configSection.Parameters[Constants.SB_CONN_STRING]).Value;
+
+            ServiceBusSenderClient2.Send(connString, "svc4", message, LogError)
+                .GetAwaiter()
+                .GetResult();
         }
 
         void LogError(Exception e)

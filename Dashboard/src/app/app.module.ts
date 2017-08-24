@@ -34,8 +34,8 @@ import { LoadDriverModule } from './load-driver/load-driver.module';
   providers: [
     {
       provide: BaseEndpoint,
-      useValue: 'http://52.184.162.93:8080/4b830bfd-bfc6-47d1-b551-e2d8e183964d/131479019334563073/30ac3fb8-c85d-4325-bb9e-0e5dfa9d4af8'
-      //useValue: 'http://localhost:8080/717c71fb-00fb-4f4b-bc52-375b7b095dc1/131479025157455780/dc75ed6d-ef5f-4e99-8c61-0da0a7f99410'
+      useValue: 'http://52.184.162.93:8080/52411a5a-2cf8-431c-9a44-69f7b854b423/131480682769426078/845202fa-097d-4d98-9e01-9bac411c79e9'
+      //useValue: 'http://localhost:8080/dbcd4397-f5f9-41cc-884c-e9aa449afa5b/131480150046107502/95353b4a-5b58-4709-951d-6daa0bf87f4b'
     },
   ],
   bootstrap: [AppComponent]

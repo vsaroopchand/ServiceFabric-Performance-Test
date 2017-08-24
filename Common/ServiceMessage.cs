@@ -40,8 +40,11 @@ namespace Common
         public DateTime TimeNow { get; set; }
     }
 
-    public class JsonNetServiceMessageSerializer : Microsoft.ServiceFabric.Data.IStateSerializer<ServiceMessage>
-    {
+    /// <summary>
+    /// custom serializer using JSON.NET (for performance, https://www.newtonsoft.com/json/help/html/Performance.htm)
+    /// </summary>
+    public class JsonNetServiceMessageSerializer : IStateSerializer<ServiceMessage>
+    {    
         ServiceMessage IStateSerializer<ServiceMessage>.Read(BinaryReader binaryReader)
         {
             var message = new ServiceMessage();
@@ -74,12 +77,12 @@ namespace Common
 
         ServiceMessage IStateSerializer<ServiceMessage>.Read(ServiceMessage baseValue, BinaryReader binaryReader)
         {
-            return ((Microsoft.ServiceFabric.Data.IStateSerializer<ServiceMessage>)this).Read(binaryReader);
+            return ((IStateSerializer<ServiceMessage>)this).Read(binaryReader);
         }
 
         void IStateSerializer<ServiceMessage>.Write(ServiceMessage baseValue, ServiceMessage targetValue, BinaryWriter binaryWriter)
         {
-            ((Microsoft.ServiceFabric.Data.IStateSerializer<ServiceMessage>)this).Write(targetValue, binaryWriter);
+            ((IStateSerializer<ServiceMessage>)this).Write(targetValue, binaryWriter);
         }
     }
 }

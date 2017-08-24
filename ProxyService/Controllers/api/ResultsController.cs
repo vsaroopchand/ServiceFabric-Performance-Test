@@ -42,6 +42,21 @@ namespace ProxyService.Controllers.api
             }
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
+        {
+            try
+            {
+                var results = await GetResultsAsync();
+                var model = results.Where(t => t.MessageId.Equals(id)).Select(t => { return new ResultModel().InitFromServiceMessage(t); });
+                return Ok(model);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
 
         [HttpGet("boxplot/{id}")]
         public async Task<IActionResult> BoxPlotResult(string id)
