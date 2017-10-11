@@ -55,7 +55,7 @@ namespace Service3
                 await tx.CommitAsync();
             }
 
-            var service = ServiceProxy.Create<IServiceFour>(new Uri(Service4Uri), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(1));
+            var service = ServiceProxy.Create<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1));
             await service.VisitByRemotingAsync(message);
             
         }
@@ -131,7 +131,8 @@ namespace Service3
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
-                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub")
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
+                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub")
             };
         }
 
@@ -195,6 +196,27 @@ namespace Service3
             ServiceBusSenderClient2.Send(connString, "svc4", message, LogError)
                 .GetAwaiter()
                 .GetResult();
+        }
+
+        void ProcessEventHubMessage(string package)
+        {
+            var message = JsonConvert.DeserializeObject<ServiceMessage>(package);
+            message.StampThree.Visited = true;
+            message.StampThree.TimeNow = DateTime.UtcNow;
+
+            ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            ConfigurationSection configSection = configPackage.Settings.Sections[Constants.EH_CONFIG_SECTION];
+            var connString = (configSection.Parameters[Constants.EH_CONN_STRING]).Value;
+            var path = (configSection.Parameters[Constants.EH_SENDTO_HUB_PATH]).Value;
+
+            try
+            {
+                new EventHubSender(connString, path).Send(message).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                LogError(e);
+            }
         }
 
         void LogError(Exception e)

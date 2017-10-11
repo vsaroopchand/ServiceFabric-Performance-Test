@@ -103,7 +103,8 @@ namespace Service4
                 {
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
-                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub")
+                new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
+                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub")
             };
         }
 
@@ -141,6 +142,27 @@ namespace Service4
             ServiceBusSenderClient2.Send(connString, "end", message, LogError)
                 .GetAwaiter()
                 .GetResult();
+        }
+
+        void ProcessEventHubMessage(string package)
+        {
+            var message = JsonConvert.DeserializeObject<ServiceMessage>(package);
+
+            VisitByRemotingAsync(message).GetAwaiter().GetResult();
+
+            ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
+            ConfigurationSection configSection = configPackage.Settings.Sections[Constants.EH_CONFIG_SECTION];
+            var connString = (configSection.Parameters[Constants.EH_CONN_STRING]).Value;
+            var path = (configSection.Parameters[Constants.EH_SENDTO_HUB_PATH]).Value;
+
+            try
+            {
+                new EventHubSender(connString, path).Send(message).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                LogError(e);
+            }
         }
 
         void LogError(Exception e)

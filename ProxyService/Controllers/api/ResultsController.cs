@@ -48,7 +48,7 @@ namespace ProxyService.Controllers.api
             try
             {
                 var results = await GetResultsAsync();
-                var model = results.Where(t => t.MessageId.Equals(id)).Select(t => { return new ResultModel().InitFromServiceMessage(t); });
+                var model = results.Where(t => t.SessionId.Equals(id)).Select(t => { return new ResultModel().InitFromServiceMessage(t); });
                 return Ok(model);
             }
             catch (Exception e)

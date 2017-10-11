@@ -17,5 +17,12 @@
         public const string SB_TOPIC = "Topic";
         public const string SB_SUBSCRIPTION = "Subscription";
 
+        public const string EH_CONFIG_SECTION = "EHConfig";
+        public const string EH_HUB_PATH = "HubPath";
+        public const string EH_SENDTO_HUB_PATH = "SendToPath";
+        public const string EH_CONSUMER_GROUP = "ConsumerGroup";
+        public const string EH_CONN_STRING = "ConnString";
+        public const string EH_STORAGE_CONN_STRING = "StorageAccount";
+
     }
 }

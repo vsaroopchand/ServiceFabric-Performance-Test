@@ -1,3 +1,4 @@
+import { EventHubCommunicationService } from './../../shared/services/eventhub-comm.service';
 import { SessionService } from './../../shared/services/session.service';
 import { RemotingCommunicationService } from './../../shared/services/remoting-comm.service';
 import { SocketCommunicationService } from './../../shared/services/socket-comm.service';
@@ -25,6 +26,7 @@ export class LoadDriverContainer implements OnInit {
         private socket: SocketCommunicationService,
         private remoting: RemotingCommunicationService,
         private serviceBus: ServiceBusCommunicationService,
+        private eventHub: EventHubCommunicationService,
         private sessionService: SessionService) {
     }
 
@@ -63,7 +65,8 @@ export class LoadDriverContainer implements OnInit {
                         this.remoting.get(currentSession),
                         this.socket.get(currentSession),
                         this.serviceBus.get(currentSession),
-                    3)
+                        this.eventHub.get(currentSession),
+                    4)
                     .subscribe(res => {
                         // do nothing
                     },

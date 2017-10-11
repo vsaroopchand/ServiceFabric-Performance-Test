@@ -1,3 +1,4 @@
+import { EventHubCommunicationService } from './services/eventhub-comm.service';
 import { ServiceBusCommunicationService } from './services/servicebus-comm.service';
 import { SessionService } from './services/session.service';
 import { RemotingCommunicationService } from './services/remoting-comm.service';
@@ -14,6 +15,7 @@ import { NgModule } from '@angular/core';
         SocketCommunicationService,
         RemotingCommunicationService,
         ServiceBusCommunicationService,
+        EventHubCommunicationService,
         SessionService
     ]
 })
