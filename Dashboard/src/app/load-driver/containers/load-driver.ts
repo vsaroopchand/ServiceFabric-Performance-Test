@@ -8,6 +8,7 @@ import { ServiceBusCommunicationService } from './../../shared/services/serviceb
 import { Observable } from 'rxjs/Observable';
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { DotNettySimpleService } from 'app/shared/services/dotnetty-simple.service';
 
 @Component({
     selector: 'my-load-driver-container',
@@ -27,6 +28,7 @@ export class LoadDriverContainer implements OnInit {
         private remoting: RemotingCommunicationService,
         private serviceBus: ServiceBusCommunicationService,
         private eventHub: EventHubCommunicationService,
+        private dotnettySimple: DotNettySimpleService,
         private sessionService: SessionService) {
     }
 
@@ -38,7 +40,7 @@ export class LoadDriverContainer implements OnInit {
 
     reset(e: any) {
         this.sessionService.createSession();
-
+        
         // notify any listeners
         this.onResetCallback && this.onResetCallback.emit({});
     }
@@ -66,7 +68,8 @@ export class LoadDriverContainer implements OnInit {
                         this.socket.get(currentSession),
                         this.serviceBus.get(currentSession),
                         this.eventHub.get(currentSession),
-                    4)
+                        this.dotnettySimple.get(currentSession),
+                    5)
                     .subscribe(res => {
                         // do nothing
                     },

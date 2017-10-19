@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.DotNettyCommunication;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -26,6 +27,7 @@ namespace Service4
     {
         private const string WcfEndpoint = "WcfServiceEndpoint";
         private const string SocketEndpoint = "SocketEndpoint";
+        private const string DotNettySimpleTcpEndpoint = "dotnetty-simple-tcp";
         private const string AppPrefix = "Service4";
         public Service4(StatefulServiceContext context)
             : base(context)
@@ -104,7 +106,8 @@ namespace Service4
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
                 new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
-                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub")
+                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub"),
+                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp")
             };
         }
 
@@ -163,6 +166,15 @@ namespace Service4
             {
                 LogError(e);
             }
+        }
+
+        async Task ProcessDotNettyMessage(object package)
+        {
+            var message = JsonConvert.DeserializeObject<ServiceMessage>(package as string);
+            message.StampFour.Visited = true;
+            message.StampFour.TimeNow = DateTime.UtcNow;
+            
+            await VisitByRemotingAsync(message);
         }
 
         void LogError(Exception e)

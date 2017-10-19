@@ -9,7 +9,7 @@
 
   <!-- Add your custom configuration sections and parameters here. -->
   <Section Name="SBConfig">
-    <Parameter Name="SasToken" Value="Your SAS Token for Service Bus" />
+    <Parameter Name="SasToken" Value="" />
     <Parameter Name="Topic" Value="svc3" />
     <Parameter Name="Subscription" Value="express" />
   </Section>
@@ -18,8 +18,8 @@
     <Parameter Name="HubPath" Value="svc3"/>
     <Parameter Name="SendToPath" Value="svc4"/>
     <Parameter Name="ConsumerGroup" Value="$Default"/>
-    <Parameter Name="ConnString" Value="Your SAS Token Or Conn String for EventHub"/>
-    <Parameter Name="StorageAccount" Value="Your Storage Account (Blob) Conn String"/>
+    <Parameter Name="ConnString" Value=""/>
+    <Parameter Name="StorageAccount" Value=""/>
   </Section>
 
 </Settings>

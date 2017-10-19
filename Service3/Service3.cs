@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.DotNettyCommunication;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -28,6 +29,7 @@ namespace Service3
         private const string Service4Uri = "fabric:/SfPerfTest/Service4";
         private const string WcfEndpoint = "WcfServiceEndpoint";
         private const string SocketEndpoint = "SocketEndpoint";
+        private const string DotNettySimpleTcpEndpoint = "dotnetty-simple-tcp";
         private const string AppPrefix = "Service3";
         private readonly string Service4SocketUri = $"ws://localhost:{Constants.SVC4_WS_PORT}/Service4/";
         private ClientWebSocket cws;
@@ -132,7 +134,8 @@ namespace Service3
                     return new WsCommunicationListener(ctx, SocketEndpoint, AppPrefix, this.ProcessWsRequest);
                 }, "WebSocket"),
                 new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
-                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub")
+                new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub"),
+                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp")
             };
         }
 
@@ -217,6 +220,23 @@ namespace Service3
             {
                 LogError(e);
             }
+        }
+
+        async Task ProcessDotNettyMessage(object package)
+        {
+            var message = JsonConvert.DeserializeObject<ServiceMessage>(package as string);
+            message.StampThree.Visited = true;
+            message.StampThree.TimeNow = DateTime.UtcNow;
+            await Common.DotNettyCommunication.SimpleClient.SendAsync(message, this.Context, "Service4", LogError);
+            // need to do this here in order to avoid a COM error in runtime
+            //var client = new FabricClient(FabricClientRole.User);
+            //var servicePartitionResolver = ServicePartitionResolver.GetDefault();
+            //var serviceUri = this.Context.CodePackageActivationContext.ApplicationName + "/" + "Service4";
+            //var partitionList = client.QueryManager.GetPartitionListAsync(new Uri(serviceUri)).GetAwaiter().GetResult();
+
+            //var destinationEndpoint = await SimpleClient.GetSocketEndpointAsync(new Uri(serviceUri), this.Context, partitionList);
+            //await SimpleClient.SendAsync(message, destinationEndpoint.Item1, destinationEndpoint.Item2, LogError);
+
         }
 
         void LogError(Exception e)

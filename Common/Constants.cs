@@ -24,5 +24,7 @@
         public const string EH_CONN_STRING = "ConnString";
         public const string EH_STORAGE_CONN_STRING = "StorageAccount";
 
+        public const string DOTNETTY_SIMPLE_ENDPOINT = "DotNettySimpleTcp";
+
     }
 }

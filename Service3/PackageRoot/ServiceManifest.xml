@@ -36,6 +36,7 @@
       <Endpoint Name="ReplicatorEndpoint" />
       <Endpoint Name="WcfServiceEndpoint" Port="8087" Protocol="tcp"  />
       <Endpoint Name="SocketEndpoint" Port="4400" Protocol="http" Type="Internal" />
+      <Endpoint Name="dotnetty-simple-tcp" Port="9092" Protocol="tcp" Type="Internal" />
     </Endpoints>
   </Resources>
 </ServiceManifest>

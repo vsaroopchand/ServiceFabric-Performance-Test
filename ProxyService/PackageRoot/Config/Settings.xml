@@ -2,11 +2,11 @@
 <Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <!-- Add your custom configuration sections and parameters here -->
   <Section Name="SBConfig">
-    <Parameter Name="SasToken" Value="Your SAS Token Or Conn String for Service Bus" />
-    <Parameter Name="Topic" Value="svc2" />    
+    <Parameter Name="SasToken" Value="" />
+    <Parameter Name="Topic" Value="svc2" />
   </Section>
   <Section Name="EHConfig">
     <Parameter Name="SendToPath" Value="svc2"/>
-    <Parameter Name="ConnString" Value="Your SAS Token Or Conn String for Event Hub"/>    
+    <Parameter Name="ConnString" Value=""/>
   </Section>
 </Settings>
