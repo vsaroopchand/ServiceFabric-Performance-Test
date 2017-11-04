@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.DotNettyCommunication;
+using Common.Grpc;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -30,6 +31,7 @@ namespace Service2
         private const string WcfEndpoint = "WcfServiceEndpoint";
         private const string SocketEndpoint = "SocketEndpoint";
         private const string DotNettySimpleTcpEndpoint = "dotnetty-simple-tcp";
+        private const string GrpcEndpoint = "GrpcServiceEndpoint";
         private const string AppPrefix = "Service2";
         private readonly string Service3SocketUri = $"ws://localhost:{Constants.SVC3_WS_PORT}/Service3/";
         private ClientWebSocket cws;
@@ -126,6 +128,8 @@ namespace Service2
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
+            var grpcServices = new[] { GrpcMessageService.BindService(new GrpcMessageServiceImpl(this.Context, ProcessGrpcMessage)) };
+
             return new[] {
                 new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
                 new ServiceReplicaListener((ctx) =>
@@ -142,7 +146,8 @@ namespace Service2
                 }, "WebSocket"),
                 new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
                 new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub"),
-                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp")
+                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp"),
+                new ServiceReplicaListener((ctx) => { return new GrpcCommunicationListener(ctx, grpcServices , LogMessage, GrpcEndpoint); }, "grpc")
             };
         }
 
@@ -240,7 +245,7 @@ namespace Service2
             message.StampTwo.Visited = true;
             message.StampTwo.TimeNow = DateTime.UtcNow;
 
-            await Common.DotNettyCommunication.SimpleClient.SendAsync(message, this.Context, "Service3", LogError);
+            await SimpleClient.SendAsync(message, this.Context, "Service3", LogError);
 
 
             // need to do this here in order to avoid a COM error in runtime
@@ -253,9 +258,20 @@ namespace Service2
             //await SimpleClient.SendAsync(message, destinationEndpoint.Item1, destinationEndpoint.Item2, LogError);                        
         }
 
+        public void ProcessGrpcMessage(ServiceMessage2 message)
+        {                
+            message.StampTwo.Visited = true;
+            message.StampTwo.TimeNow = DateTime.UtcNow.Ticks;
+            GrpcClienHelper.SendMessage("Service3", message).GetAwaiter().GetResult(); ;
+        }
+
         void LogError(Exception e)
         {
             ServiceEventSource.Current.ServiceMessage(this.Context, e.Message);
+        }
+        void LogMessage(string message)
+        {
+            ServiceEventSource.Current.ServiceMessage(this.Context, message);
         }
     }
 }

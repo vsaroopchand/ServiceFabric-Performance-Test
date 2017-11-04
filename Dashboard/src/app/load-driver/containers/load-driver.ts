@@ -9,6 +9,7 @@ import { Observable } from 'rxjs/Observable';
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DotNettySimpleService } from 'app/shared/services/dotnetty-simple.service';
+import { GrpcService } from 'app/shared/services/grpc.service';
 
 @Component({
     selector: 'my-load-driver-container',
@@ -29,6 +30,7 @@ export class LoadDriverContainer implements OnInit {
         private serviceBus: ServiceBusCommunicationService,
         private eventHub: EventHubCommunicationService,
         private dotnettySimple: DotNettySimpleService,
+        private grpcService: GrpcService,
         private sessionService: SessionService) {
     }
 
@@ -40,7 +42,7 @@ export class LoadDriverContainer implements OnInit {
 
     reset(e: any) {
         this.sessionService.createSession();
-        
+
         // notify any listeners
         this.onResetCallback && this.onResetCallback.emit({});
     }
@@ -63,13 +65,14 @@ export class LoadDriverContainer implements OnInit {
             (x) => {
 
                 Observable.merge(
-                        this.wcf.get(currentSession),
-                        this.remoting.get(currentSession),
-                        this.socket.get(currentSession),
-                        this.serviceBus.get(currentSession),
-                        this.eventHub.get(currentSession),
-                        this.dotnettySimple.get(currentSession),
-                    5)
+                    this.wcf.get(currentSession),
+                    this.remoting.get(currentSession),
+                    this.socket.get(currentSession),
+                    this.serviceBus.get(currentSession),
+                    this.eventHub.get(currentSession),
+                    this.dotnettySimple.get(currentSession),
+                    this.grpcService.get(currentSession),
+                    6)
                     .subscribe(res => {
                         // do nothing
                     },

@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.DotNettyCommunication;
+using Common.Grpc;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
@@ -28,6 +29,7 @@ namespace Service4
         private const string WcfEndpoint = "WcfServiceEndpoint";
         private const string SocketEndpoint = "SocketEndpoint";
         private const string DotNettySimpleTcpEndpoint = "dotnetty-simple-tcp";
+        private const string GrpcEndpoint = "GrpcServiceEndpoint";
         private const string AppPrefix = "Service4";
         public Service4(StatefulServiceContext context)
             : base(context)
@@ -91,6 +93,9 @@ namespace Service4
 
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
+            var grpcServices = new[] { GrpcMessageService.BindService(new GrpcMessageServiceImpl(this.Context, ProcessGrpcMessage)) };
+
+
             return new[] {
                 new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
                 new ServiceReplicaListener((ctx) =>
@@ -107,7 +112,8 @@ namespace Service4
                 }, "WebSocket"),
                 new ServiceReplicaListener((ctx) => { return new ServiceBusTopicListener(ctx, ProcessTopicMessage, LogError, ServiceBusTopicReceiverType.Performance); }, "PubSub"),
                 new ServiceReplicaListener((ctx) => { return new EventHubCommunicationListener(ctx, ProcessEventHubMessage, LogError); }, "EventHub"),
-                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp")
+                new ServiceReplicaListener((ctx) => { return new SimpleCommunicationListener(ctx, DotNettySimpleTcpEndpoint, ProcessDotNettyMessage, LogError); }, "DotNettySimpleTcp"),
+                new ServiceReplicaListener((ctx) => { return new GrpcCommunicationListener(ctx, grpcServices , LogMessage, GrpcEndpoint); }, "grpc")
             };
         }
 
@@ -177,9 +183,50 @@ namespace Service4
             await VisitByRemotingAsync(message);
         }
 
+        public void ProcessGrpcMessage(ServiceMessage2 message)
+        {
+            message.StampFour.Visited = true;
+            message.StampFour.TimeNow = DateTime.UtcNow.Ticks;
+
+            // convert protobuffer message to Datacontract and send it back to web proxy using http
+            var m2 = new ServiceMessage
+            {
+                MessageId = message.MessageId,
+                MessageJson = message.MessageJson,
+                SessionId = message.SessionId,
+                CommChannel = message.CommChannel,
+                StampOne = new Common.VisitStamp
+                {
+                    Visited = message.StampOne.Visited,
+                    TimeNow = new DateTime(message.StampOne.TimeNow)
+                },
+                StampTwo = new Common.VisitStamp
+                {
+                    Visited = message.StampTwo.Visited,
+                    TimeNow = new DateTime(message.StampTwo.TimeNow)
+                },
+                StampThree = new Common.VisitStamp
+                {
+                    Visited = message.StampThree.Visited,
+                    TimeNow = new DateTime(message.StampThree.TimeNow)
+                },
+                StampFour = new Common.VisitStamp
+                {
+                    Visited = true,
+                    TimeNow = DateTime.UtcNow,
+                },
+            };
+
+            VisitByRemotingAsync(m2).GetAwaiter().GetResult();
+        }
+
         void LogError(Exception e)
         {
             ServiceEventSource.Current.ServiceMessage(this.Context, e.Message);
+        }
+        void LogMessage(string message)
+        {
+            ServiceEventSource.Current.ServiceMessage(this.Context, message);
         }
     }
 }

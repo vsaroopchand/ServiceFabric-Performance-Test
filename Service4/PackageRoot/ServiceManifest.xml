@@ -38,6 +38,7 @@
       <Endpoint Name="WcfServiceEndpoint" Port="8088" Protocol="tcp"  />
       <Endpoint Name="SocketEndpoint" Port="4500" Protocol="http" Type="Internal" />
       <Endpoint Name="dotnetty-simple-tcp" Port="9093" Protocol="tcp" Type="Internal" />
+      <Endpoint Name="GrpcServiceEndpoint" Port="8898" Protocol="http" Type="Internal" />
     </Endpoints>
   </Resources>
 </ServiceManifest>

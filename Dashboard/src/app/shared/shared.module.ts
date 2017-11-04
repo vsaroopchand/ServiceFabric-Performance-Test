@@ -7,6 +7,7 @@ import { WcfCommunicationService } from './services/wcf-comm.service';
 import { DotNettySimpleService } from './services/dotnetty-simple.service';
 import { ResultService } from './services/result.service';
 import { NgModule } from '@angular/core';
+import { GrpcService } from 'app/shared/services/grpc.service';
 
 
 @NgModule({
@@ -18,6 +19,7 @@ import { NgModule } from '@angular/core';
         ServiceBusCommunicationService,
         EventHubCommunicationService,
         DotNettySimpleService,
+        GrpcService,
         SessionService
     ]
 })

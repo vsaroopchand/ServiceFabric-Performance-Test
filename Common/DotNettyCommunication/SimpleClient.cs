@@ -68,7 +68,7 @@ namespace Common.DotNettyCommunication
 
         public static async Task<Tuple<string, int>> GetSocketEndpointAsync(Uri serviceUri, StatefulServiceContext context, ServicePartitionList partitionList)
         {
-            var client = new FabricClient(FabricClientRole.User);
+            var client = new FabricClient(FabricClientRole.Admin);
             var servicePartitionResolver = ServicePartitionResolver.GetDefault();
             var address = new Tuple<string, int>("", 0);
 
@@ -85,7 +85,7 @@ namespace Common.DotNettyCommunication
         }
         public static async Task<Tuple<string, int>> GetSocketEndpointAsync(string serviceName, StatefulServiceContext context)
         {
-            var client = new FabricClient(FabricClientRole.User);
+            var client = new FabricClient(FabricClientRole.Admin);
             var servicePartitionResolver = ServicePartitionResolver.GetDefault();
             var serviceUri = context.CodePackageActivationContext.ApplicationName + "/" + serviceName;
             var partitionList = await client.QueryManager.GetPartitionListAsync(new Uri(serviceUri));

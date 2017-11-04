@@ -1,0 +1,37 @@
+﻿syntax = "proto3";
+
+package Common.Grpc;
+
+service GrpcMessageService {
+  
+  rpc Send (ServiceMessage2) returns (Noop) {}
+}
+
+message Noop {
+
+}
+message ServiceMessage2 {
+  string sessionId = 1;
+    
+  string messageId = 2;
+  
+  string commChannel = 3;
+  
+  string messageJson = 4;
+  
+  VisitStamp stampOne = 5;
+  
+  VisitStamp stampTwo = 6;
+  
+  VisitStamp stampThree = 7;
+  
+  VisitStamp stampFour = 8;
+  
+  VisitStamp stampFive = 9;
+}
+
+message VisitStamp
+{    
+    bool visited = 1;    
+    int64 timeNow = 2;
+}

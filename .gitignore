@@ -54,3 +54,8 @@ Thumbs.db
 /Dashboard/node_modules
 /Dashboard/src/public
 /SfPerfTest/pkg/Debug
+/Greeter
+/protos
+/generate_protos.bat
+/csharp
+/Service2/PackagRoot/Config/Settings.xml
