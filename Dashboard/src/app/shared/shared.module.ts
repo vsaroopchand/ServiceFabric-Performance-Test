@@ -9,7 +9,6 @@ import { ResultService } from './services/result.service';
 import { NgModule } from '@angular/core';
 import { GrpcService } from 'app/shared/services/grpc.service';
 
-
 @NgModule({
     providers: [
         ResultService,
@@ -18,8 +17,8 @@ import { GrpcService } from 'app/shared/services/grpc.service';
         RemotingCommunicationService,
         ServiceBusCommunicationService,
         EventHubCommunicationService,
-        DotNettySimpleService,
-        GrpcService,
+        DotNettySimpleService,   
+        GrpcService,     
         SessionService
     ]
 })

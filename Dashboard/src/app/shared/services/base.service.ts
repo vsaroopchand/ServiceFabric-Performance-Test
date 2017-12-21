@@ -36,7 +36,7 @@ export class BaseService<T> {
     }
 
     protected handleError(error: any) {
-        console.error('server error:', error);
+        console.log('server error:', error);
         if (error instanceof Response) {
             let errMessage = '';
             try {

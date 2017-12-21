@@ -9,7 +9,7 @@
 
   <!-- Add your custom configuration sections and parameters here. -->
   <Section Name="SBConfig">
-    <Parameter Name="SasToken" Value="" />
+    <Parameter Name="SasToken" Value="Endpoint=sb:.." />
     <Parameter Name="Topic" Value="svc4" />
     <Parameter Name="Subscription" Value="express" />
   </Section>
@@ -18,8 +18,8 @@
     <Parameter Name="HubPath" Value="svc4"/>
     <Parameter Name="SendToPath" Value="localhost"/>
     <Parameter Name="ConsumerGroup" Value="$Default"/>
-    <Parameter Name="ConnString" Value=""/>
-    <Parameter Name="StorageAccount" Value=""/>
+    <Parameter Name="ConnString" Value="Endpoint=sb:.."/>
+    <Parameter Name="StorageAccount" Value="DefaultEndpointsProtocol=https;AccountName=.."/>
   </Section>
 
 </Settings>

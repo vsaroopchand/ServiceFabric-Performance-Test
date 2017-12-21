@@ -1,23 +1,25 @@
-﻿using System;
+﻿using Common;
+using Common.RemotingV2.CustomSeriaizer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.ServiceFabric.Data;
+using Microsoft.ServiceFabric.Data.Collections;
+using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
+using Microsoft.ServiceFabric.Services.Runtime;
+using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
-using Microsoft.ServiceFabric.Services.Communication.Runtime;
-using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.ServiceFabric.Data;
 
 namespace ProxyService
 {
     /// <summary>
     /// The FabricRuntime creates an instance of this class for each service type instance. 
     /// </summary>
-    internal sealed class ProxyService : StatefulService
+    internal sealed class ProxyService : StatefulService, IWebProxyService
     {
         public ProxyService(StatefulServiceContext context)
             : base(context)
@@ -31,6 +33,23 @@ namespace ProxyService
             }
         }
 
+        public async Task VisitByRemotingAsync(ServiceMessage message)
+        {
+            message.StampFive.Visited = true;
+            message.StampFive.TimeNow = DateTime.UtcNow;
+
+            var storage = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                await storage.AddOrUpdateAsync(tx, message.MessageId, message, (k, m) =>
+                {
+                    return message;
+                });
+
+                await tx.CommitAsync();
+            }            
+        }
+
         /// <summary>
         /// Optional override to create listeners (like tcp, http) for this service instance.
         /// </summary>
@@ -39,6 +58,11 @@ namespace ProxyService
         {
             return new ServiceReplicaListener[]
             {
+                new ServiceReplicaListener((ctx) =>
+                 {
+                     return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+
+                 }, name: "RemotingV2"),
                 new ServiceReplicaListener(serviceContext =>
                     new KestrelCommunicationListener(serviceContext, "ServiceEndpoint", (url, listener) =>
                     {

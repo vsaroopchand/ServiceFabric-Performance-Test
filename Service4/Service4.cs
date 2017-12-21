@@ -1,11 +1,15 @@
 ﻿using Common;
 using Common.DotNettyCommunication;
 using Common.Grpc;
+using Common.RemotingV2.CustomSeriaizer;
 using Microsoft.ServiceFabric.Data.Collections;
+using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -13,8 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +34,8 @@ namespace Service4
         private const string DotNettySimpleTcpEndpoint = "dotnetty-simple-tcp";
         private const string GrpcEndpoint = "GrpcServiceEndpoint";
         private const string AppPrefix = "Service4";
+        private const string webProxyUri = "fabric:/SfPerfTest/ProxyService";
+
         public Service4(StatefulServiceContext context)
             : base(context)
         {
@@ -42,7 +47,31 @@ namespace Service4
             }
         }
 
+
         public async Task VisitByRemotingAsync(ServiceMessage message)
+        {
+            message.StampFour.Visited = true;
+            message.StampFour.TimeNow = DateTime.UtcNow;
+
+            var storage = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, ServiceMessage>>("storage");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                await storage.AddAsync(tx, message.MessageId, message);
+                await tx.CommitAsync();
+            }
+            
+            var proxyFactory = new ServiceProxyFactory((c) =>
+            {
+                return new FabricTransportServiceRemotingClientFactory(serializationProvider: new ServiceRemotingJsonSerializationProvider());
+            });
+            var service = proxyFactory.CreateServiceProxy<IWebProxyService>(new Uri(webProxyUri), new ServicePartitionKey(1), listenerName: "RemotingV2");
+
+            await service.VisitByRemotingAsync(message);
+
+        }
+
+
+        public async Task EndWithHttpPost(ServiceMessage message)
         {
             message.StampFour.Visited = true;
             message.StampFour.TimeNow = DateTime.UtcNow;
@@ -54,23 +83,42 @@ namespace Service4
                 await tx.CommitAsync();
             }
 
-            using (var client = new HttpClient())
+            // .net 4.61 error https://github.com/dotnet/corefx/issues/22781
+            //using (var client = new HttpClient())
+            //{
+            //    client.DefaultRequestHeaders.Accept.Add(
+            //         new MediaTypeWithQualityHeaderValue("application/json"));
+
+            //    var package = JsonConvert.SerializeObject(message, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+
+            //    using (var response = await client.PostAsync(await GetWebApiAddress(), new StringContent(package, System.Text.Encoding.UTF8, "application/json")))
+            //    {
+            //        response.EnsureSuccessStatusCode();
+            //    }
+            //}
+            var endpoint = await GetWebApiAddress();
+            WebRequest wr = WebRequest.Create(endpoint);
+            wr.Method = "POST";
+            wr.ContentType = "application/json";
+            var bodyJson = JsonConvert.SerializeObject(message, Formatting.Indented, settings: new JsonSerializerSettings
             {
-                client.DefaultRequestHeaders.Accept.Add(
-                     new MediaTypeWithQualityHeaderValue("application/json"));
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
 
-                var package = JsonConvert.SerializeObject(message, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            var body = Encoding.UTF8.GetBytes(bodyJson);
+            wr.ContentLength = body.Length;
 
-                using (var response = await client.PostAsync(await GetWebApiAddress(), new StringContent(package, System.Text.Encoding.UTF8, "application/json")))
-                {
-                    response.EnsureSuccessStatusCode();
-                }
+
+            using(var stream = wr.GetRequestStream())
+            {
+                stream.Write(body, 0, body.Length);
             }
+            
         }
 
         public async Task VisitWcfAsync(ServiceMessage message)
         {
-            await VisitByRemotingAsync(message);
+            await EndWithHttpPost(message);
         }
 
         public async Task<string> GetWebApiAddress()
@@ -97,7 +145,12 @@ namespace Service4
 
 
             return new[] {
-                new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
+                //new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
+                new ServiceReplicaListener((ctx) =>
+                 {
+                     return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+
+                 }, name: "RemotingV2"),
                 new ServiceReplicaListener((ctx) =>
                 {
                     return new WcfCommunicationListener<IServiceFour>(
@@ -126,7 +179,7 @@ namespace Service4
                     var package = Encoding.UTF8.GetString(data);
                     var message = JsonConvert.DeserializeObject<ServiceMessage>(package);
 
-                    VisitByRemotingAsync(message)
+                    EndWithHttpPost(message)
                         .GetAwaiter()
                         .GetResult();
 
@@ -142,7 +195,7 @@ namespace Service4
 
         void ProcessTopicMessage(ServiceMessage message)
         {
-            VisitByRemotingAsync(message).GetAwaiter().GetResult();
+            EndWithHttpPost(message).GetAwaiter().GetResult();
 
             ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
             ConfigurationSection configSection = configPackage.Settings.Sections[Constants.SB_CONFIG_SECTION];
@@ -157,7 +210,7 @@ namespace Service4
         {
             var message = JsonConvert.DeserializeObject<ServiceMessage>(package);
 
-            VisitByRemotingAsync(message).GetAwaiter().GetResult();
+            EndWithHttpPost(message).GetAwaiter().GetResult();
 
             ConfigurationPackage configPackage = this.Context.CodePackageActivationContext.GetConfigurationPackageObject("Config");
             ConfigurationSection configSection = configPackage.Settings.Sections[Constants.EH_CONFIG_SECTION];
@@ -180,7 +233,7 @@ namespace Service4
             message.StampFour.Visited = true;
             message.StampFour.TimeNow = DateTime.UtcNow;
             
-            await VisitByRemotingAsync(message);
+            await EndWithHttpPost(message);
         }
 
         public void ProcessGrpcMessage(ServiceMessage2 message)
@@ -217,7 +270,7 @@ namespace Service4
                 },
             };
 
-            VisitByRemotingAsync(m2).GetAwaiter().GetResult();
+            EndWithHttpPost(m2).GetAwaiter().GetResult();
         }
 
         void LogError(Exception e)

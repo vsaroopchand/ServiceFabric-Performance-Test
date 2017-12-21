@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.DotNettyCommunication;
 using Common.Grpc;
+using Common.RemotingV2.CustomSeriaizer;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
@@ -9,6 +10,8 @@ using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Newtonsoft.Json;
 using System;
@@ -59,7 +62,14 @@ namespace Service3
                 await tx.CommitAsync();
             }
 
-            var service = ServiceProxy.Create<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1));
+            //var service = ServiceProxy.Create<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1));
+            var proxyFactory = new ServiceProxyFactory((c) =>
+            {
+                return new FabricTransportServiceRemotingClientFactory(serializationProvider: new ServiceRemotingJsonSerializationProvider());
+            });
+            var service = proxyFactory.CreateServiceProxy<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1), listenerName: "RemotingV2");
+
+
             await service.VisitByRemotingAsync(message);
             
         }
@@ -124,7 +134,12 @@ namespace Service3
             var grpcServices = new[] { GrpcMessageService.BindService(new GrpcMessageServiceImpl(this.Context, ProcessGrpcMessage)) };
 
             return new[] {
-                new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
+                //new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
+                new ServiceReplicaListener((ctx) =>
+                 {
+                     return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+
+                 }, name: "RemotingV2"),
                 new ServiceReplicaListener((ctx) =>
                 {
                     return new WcfCommunicationListener<IServiceThree>(

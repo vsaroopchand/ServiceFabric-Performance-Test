@@ -58,4 +58,5 @@ Thumbs.db
 /protos
 /generate_protos.bat
 /csharp
-/Service2/PackagRoot/Config/Settings.xml
+/generate_protos-njs.bat
+.vs

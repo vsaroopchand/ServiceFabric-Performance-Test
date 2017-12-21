@@ -16,7 +16,8 @@ namespace Common.Grpc
         }
 
         public override Task<Noop> Send(ServiceMessage2 request, ServerCallContext context)
-        {           
+        {       
+            
             this._messageHandle?.Invoke(request);
             return Task.FromResult(new Noop { });
         }

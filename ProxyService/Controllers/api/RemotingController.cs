@@ -1,9 +1,11 @@
 using Common;
+using Common.RemotingV2.CustomSeriaizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
+using Microsoft.ServiceFabric.Services.Remoting.V2.FabricTransport.Client;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
@@ -49,7 +51,13 @@ namespace ProxyService.Controllers.api
                 //}
 
                 var partitionKey = new ServicePartitionKey(1);
-                var service = ServiceProxy.Create<IServiceTwo>(new Uri(Endpoint), partitionKey);
+                var proxyFactory = new ServiceProxyFactory((c) =>
+                {
+                    return new FabricTransportServiceRemotingClientFactory( serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                });
+
+                var service = proxyFactory.CreateServiceProxy<IServiceTwo>(new Uri(Endpoint), partitionKey, listenerName: "RemotingV2");                
+                //var service = ServiceProxy.Create<IServiceTwo>(new Uri(Endpoint), partitionKey);
                 await service.VisitByRemotingAsync(message);
 
                 return Ok(new { id = id});
