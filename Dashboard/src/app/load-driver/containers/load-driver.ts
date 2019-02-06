@@ -70,7 +70,7 @@ export class LoadDriverContainer implements OnInit {
                     this.socket.get(currentSession),
                     this.serviceBus.get(currentSession),
                     this.eventHub.get(currentSession),
-                    this.dotnettySimple.get(currentSession),
+                    //this.dotnettySimple.get(currentSession),
                     this.grpcService.get(currentSession),
                     6)
                     .subscribe(res => {

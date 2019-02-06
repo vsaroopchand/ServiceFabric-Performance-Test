@@ -53,7 +53,8 @@ namespace ProxyService.Controllers.api
                 var partitionKey = new ServicePartitionKey(1);
                 var proxyFactory = new ServiceProxyFactory((c) =>
                 {
-                    return new FabricTransportServiceRemotingClientFactory( serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                    //return new FabricTransportServiceRemotingClientFactory( serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                    return new FabricTransportServiceRemotingClientFactory();
                 });
 
                 var service = proxyFactory.CreateServiceProxy<IServiceTwo>(new Uri(Endpoint), partitionKey, listenerName: "RemotingV2");                

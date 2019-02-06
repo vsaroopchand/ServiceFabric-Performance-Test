@@ -65,7 +65,8 @@ namespace Service3
             //var service = ServiceProxy.Create<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1));
             var proxyFactory = new ServiceProxyFactory((c) =>
             {
-                return new FabricTransportServiceRemotingClientFactory(serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                //return new FabricTransportServiceRemotingClientFactory(serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                return new FabricTransportServiceRemotingClientFactory();
             });
             var service = proxyFactory.CreateServiceProxy<IServiceFour>(new Uri(Service4Uri), new ServicePartitionKey(1), listenerName: "RemotingV2");
 
@@ -137,7 +138,8 @@ namespace Service3
                 //new ServiceReplicaListener(this.CreateServiceRemotingListener, name: "Remoting"),
                 new ServiceReplicaListener((ctx) =>
                  {
-                     return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                     //return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                     return new FabricTransportServiceRemotingListener(ctx, this);
 
                  }, name: "RemotingV2"),
                 new ServiceReplicaListener((ctx) =>

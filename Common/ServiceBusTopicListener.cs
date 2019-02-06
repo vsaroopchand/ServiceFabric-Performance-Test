@@ -166,13 +166,17 @@ namespace Common
             var subClient = _factory.CreateSubscriptionClient(_topicName, _subscriptionName);
             subClient.PrefetchCount = 100;
             subClient.OnMessageAsync(async message =>
-            {
+            {                
                 await Task.Run(() =>
                 {
                     var messageBody = message.GetBody<string>();
                     var serviceMessage = JsonConvert.DeserializeObject<ServiceMessage>(messageBody);
                     _callback?.Invoke(serviceMessage);
+                }).ContinueWith(async t =>
+                {
+                    await message.CompleteAsync();
                 });
+                
             });
 
             await Task.Yield();

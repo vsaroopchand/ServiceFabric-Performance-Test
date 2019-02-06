@@ -60,7 +60,8 @@ namespace ProxyService
             {
                 new ServiceReplicaListener((ctx) =>
                  {
-                     return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                     //return new FabricTransportServiceRemotingListener(ctx, this, serializationProvider: new ServiceRemotingJsonSerializationProvider());
+                     return new FabricTransportServiceRemotingListener(ctx, this);
 
                  }, name: "RemotingV2"),
                 new ServiceReplicaListener(serviceContext =>
@@ -77,7 +78,7 @@ namespace ProxyService
                                             .AddSingleton<FabricClient>(new FabricClient(FabricClientRole.Admin)))
                                     .UseContentRoot(Directory.GetCurrentDirectory())
                                     .UseStartup<Startup>()
-                                    .UseApplicationInsights()
+                                    .UseApplicationInsights("1636356e-2af2-4103-bbf5-de268f7d20ee")
                                     .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
                                     .UseUrls(url)
                                     .Build();
